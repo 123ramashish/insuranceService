@@ -200,6 +200,28 @@ class EmployeeManager {
       return res.status(500).send("Something went wrong!");
     }
   }
+
+  async deleteEmployee(req, res) {
+    try {
+      // Extract employeeId from request parameters
+      const { employeeId } = req.params;
+
+      // Find and delete the employee with the given employeeId
+      const deletedEmployee = await Employee.findOneAndDelete({ employeeId });
+
+      // Check if the employee was found and deleted
+      if (!deletedEmployee) {
+        return res.status(404).send("Employee not found");
+      }
+
+      // Send success response if deletion was successful
+      return res.status(200).send("Employee deleted successfully!");
+    } catch (err) {
+      // Log the error and send a 500 response for server-side errors
+      console.error("Error deleting employee:", err);
+      return res.status(500).send("Something went wrong!");
+    }
+  }
 }
 
 export default EmployeeManager;

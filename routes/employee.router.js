@@ -8,5 +8,6 @@ router.get("/:employeeId", employeeManager.getOneEmployee);
 router.get("/sortorgroup", employeeManager.sortGroupEmployee);
 router.post("/", employeeManager.newEmployee);
 router.post("/update", employeeManager.updateEmployee);
+router.post("/delete:employeeId", employeeManager.deleteEmployee);
 
 export default router;
