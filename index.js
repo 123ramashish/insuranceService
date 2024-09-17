@@ -5,17 +5,18 @@ import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
 import employeeRouter from "./routes/employee.router.js";
+import authRoutes from "./routes/auth.router.js";
 
 // import to resolve client folder file path
-// import path from "path";
-// import { fileURLToPath } from "url";
+import path from "path";
+import { fileURLToPath } from "url";
 import { CustomError } from "./middleware/custom.error.js";
 
 //accessing env data config
 dotenv.config();
 // accessing client folder path
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -24,11 +25,13 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-// app.use(express.static(path.join(__dirname, "/client/dist")));
-// app.get("*", (req, res) =>
-//   res.sendFile(path.join(__dirname, "/client/dist/index.html"))
-// );
+app.use(express.static(path.join(__dirname, "/client/dist")));
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "/client/dist/index.html"))
+);
 app.use("/api/employee", employeeRouter);
+app.use("/api/auth", authRoutes);
+
 // custom error handling
 app.use((req, res, next) => {
   next(new CustomError("API route not found", 404));
