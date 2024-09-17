@@ -5,7 +5,7 @@ import moment from "moment"; // You can use moment.js for date formatting
 const todayDate = () => moment().format("DD-MM-YYYY");
 
 // Define the User schema
-const userSchema = new mongoose.Schema(
+const employeeSchema = new mongoose.Schema(
   {
     employeeId: {
       type: String,
@@ -52,6 +52,6 @@ const userSchema = new mongoose.Schema(
 );
 
 // Create a model based on the schema
-const User = mongoose.model("User", userSchema);
+const Employee = mongoose.model("Employee", employeeSchema);
 
-export default User;
+export default Employee;

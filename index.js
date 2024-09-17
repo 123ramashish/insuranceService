@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
-import userRouter from "./routes/user.router.js";
+import employeeRouter from "./routes/employee.router.js";
 
 // import to resolve client folder file path
 // import path from "path";
@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 // app.get("*", (req, res) =>
 //   res.sendFile(path.join(__dirname, "/client/dist/index.html"))
 // );
-app.use("/api", userRouter);
+app.use("/api/employee", employeeRouter);
 // custom error handling
 app.use((req, res, next) => {
   next(new CustomError("API route not found", 404));

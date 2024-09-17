@@ -1,7 +1,7 @@
-import User from "../models/user.model.js";
+import Employee from "../models/employee.model.js";
 
-class userManager {
-  async newUser(req, res) {
+class EmployeeManager {
+  async newEmployee(req, res) {
     try {
       const {
         insuranceType,
@@ -16,6 +16,8 @@ class userManager {
         reason,
       } = req.body;
 
+      console.log("New employee request received");
+
       // Validate required fields
       if (
         !department?.trim() ||
@@ -26,9 +28,10 @@ class userManager {
         return res.status(400).send("All required fields must be filled");
       }
 
-      // Fetch all users to generate employeeId
-      const users = await User.find().sort({ employeeId: -1 }).limit(1);
-      const lastEmployeeId = users.length > 0 ? users[0].employeeId : "E000";
+      // Fetch the latest employee to generate the next employeeId
+      const employees = await Employee.find().sort({ employeeId: -1 }).limit(1);
+      const lastEmployeeId =
+        employees.length > 0 ? employees[0].employeeId : "E000";
 
       // Extract the numeric part of the lastEmployeeId and increment
       const lastIdNumber = parseInt(lastEmployeeId.substring(1), 10);
@@ -36,9 +39,10 @@ class userManager {
 
       // Format new employeeId with leading zeros
       const employeeId = `E${newIdNumber.toString().padStart(3, "0")}`;
+      console.log("Employee ID created:", employeeId);
 
-      // Create a new user
-      const newUser = new User({
+      // Create a new employee
+      const newEmployee = new Employee({
         employeeId,
         insuranceType: insuranceType || "Not found",
         department,
@@ -52,22 +56,24 @@ class userManager {
         reason: reason || "Not found",
       });
 
-      // Save the user to the MongoDB database
-      await newUser.save();
+      // Save the employee to the MongoDB database
+      await newEmployee.save();
+      console.log("Data saved to database");
+
       return res.status(201).send("Employee added successfully!");
     } catch (err) {
-      console.error("Error adding new user:", err);
+      console.error("Error adding employee:", err);
       return res.status(500).send("Something went wrong!");
     }
   }
 
-  async getAllUser(req, res) {
+  async getAllEmployee(req, res) {
     try {
       // Fetch all users from the database
-      const users = await User.find();
+      const employee = await Employee.find();
 
       // If no users found, send a 404 response
-      if (users.length === 0) {
+      if (employee.length === 0) {
         return res.status(404).send("No data available");
       }
 
@@ -79,3 +85,5 @@ class userManager {
     }
   }
 }
+
+export default EmployeeManager;
