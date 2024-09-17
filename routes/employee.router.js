@@ -4,7 +4,9 @@ const employeeManager = new EmployeeManager();
 const router = express.Router();
 router.get("/test", (req, res) => res.send("API is working!"));
 router.get("/", employeeManager.getAllEmployee);
+router.get("/:employeeId", employeeManager.getOneEmployee);
 router.get("/sortorgroup", employeeManager.sortGroupEmployee);
 router.post("/", employeeManager.newEmployee);
+router.post("/update", employeeManager.updateEmployee);
 
 export default router;

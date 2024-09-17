@@ -78,9 +78,30 @@ class EmployeeManager {
       }
 
       // If users are found, send them with a 200 OK status
-      return res.status(200).json(users);
+      return res.status(200).json(employee);
     } catch (err) {
       // Send a 500 response for any server-side errors
+      return res.status(500).send("Something went wrong!");
+    }
+  }
+  async getOneEmployee(req, res) {
+    try {
+      // Extract employeeId from the request parameters
+      const { employeeId } = req.params; // Use req.query if the ID is sent as a query parameter
+
+      // Fetch the employee from the database using the employeeId
+      const employee = await Employee.findOne({ employeeId });
+
+      // If no employee found, send a 404 response
+      if (!employee) {
+        return res.status(404).send("No data available");
+      }
+
+      // If employee is found, send the employee data with a 200 OK status
+      return res.status(200).json(employee);
+    } catch (err) {
+      // Send a 500 response for any server-side errors
+      console.error("Error fetching employee:", err);
       return res.status(500).send("Something went wrong!");
     }
   }
@@ -118,6 +139,64 @@ class EmployeeManager {
       return res.status(400).send("No sorting or grouping criteria provided");
     } catch (err) {
       console.error("Error processing request:", err);
+      return res.status(500).send("Something went wrong!");
+    }
+  }
+
+  async updateEmployee(req, res) {
+    try {
+      const {
+        employeeId,
+        insuranceType,
+        department,
+        typeOfLeave,
+        startDate,
+        endDate,
+        carNumber,
+        insuranceCompany,
+        premium,
+        grossPremium,
+        reason,
+      } = req.body;
+
+      // Validate required fields
+      if (
+        !employeeId ||
+        !department?.trim() ||
+        !typeOfLeave?.trim() ||
+        !startDate ||
+        !endDate
+      ) {
+        return res.status(400).send("All required fields must be filled");
+      }
+
+      // Update the employee record
+      const updatedEmployee = await Employee.findOneAndUpdate(
+        { employeeId }, // Find employee by employeeId
+        {
+          insuranceType: insuranceType || "Not found",
+          department,
+          typeOfLeave,
+          startDate,
+          endDate,
+          carNumber: carNumber || "Not found",
+          insuranceCompany: insuranceCompany || "Not found",
+          premium: premium || 0,
+          grossPremium: grossPremium || 0,
+          reason: reason || "Not found",
+        },
+        { new: true } // Return the updated document
+      );
+
+      // Check if the employee was found and updated
+      if (!updatedEmployee) {
+        return res.status(404).send("Employee not found");
+      }
+
+      console.log("Employee updated successfully");
+      return res.status(200).send("Employee updated successfully!");
+    } catch (err) {
+      console.error("Error updating employee:", err);
       return res.status(500).send("Something went wrong!");
     }
   }
