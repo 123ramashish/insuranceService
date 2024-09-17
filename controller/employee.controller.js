@@ -84,6 +84,43 @@ class EmployeeManager {
       return res.status(500).send("Something went wrong!");
     }
   }
+
+  async sortGroupEmployee(req, res) {
+    try {
+      const { sortBy, order, groupBy } = req.query; // Extract query parameters
+
+      if (sortBy) {
+        // Handle sorting
+        const sortOrder = order === "desc" ? -1 : 1; // Default to ascending if 'desc' is not provided
+        const sortOptions = { [sortBy]: sortOrder };
+
+        const employees = await Employee.find().sort(sortOptions);
+        return res.status(200).send(employees);
+      }
+
+      if (groupBy) {
+        // Handle grouping
+        const groupField = groupBy; // Field to group by
+
+        const groupedEmployees = await Employee.aggregate([
+          {
+            $group: {
+              _id: `$${groupField}`, // Group by the specified field
+              count: { $sum: 1 }, // Count the number of employees in each group
+              employees: { $push: "$$ROOT" }, // Push all employee details to the group
+            },
+          },
+        ]);
+
+        return res.status(200).send(groupedEmployees);
+      }
+
+      return res.status(400).send("No sorting or grouping criteria provided");
+    } catch (err) {
+      console.error("Error processing request:", err);
+      return res.status(500).send("Something went wrong!");
+    }
+  }
 }
 
 export default EmployeeManager;
