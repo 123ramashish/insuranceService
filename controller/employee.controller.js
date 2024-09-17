@@ -222,6 +222,40 @@ class EmployeeManager {
       return res.status(500).send("Something went wrong!");
     }
   }
+
+  async duplicateEmployee(req, res) {
+    try {
+      // Extract employeeId from request parameters
+      const { id } = req.params;
+
+      // Find the existing employee by employeeId
+      const existingEmployee = await Employee.findOne({ employeeId: id });
+
+      // If the employee is not found, send a 404 response
+      if (!existingEmployee) {
+        return res.status(404).send("Employee not found");
+      }
+
+      // Remove the employeeId from the existing employee document
+      const { employeeId, ...employeeData } = existingEmployee.toObject();
+
+      // Create a new Employee instance with the copied data
+      const newEmployee = new Employee({
+        ...employeeData,
+        // You can add any default values here if needed
+      });
+
+      // Save the new employee to the database
+      await newEmployee.save();
+
+      // Send a success response
+      return res.status(201).send("Employee duplicated successfully!");
+    } catch (err) {
+      // Log the error and send a 500 response for server-side errors
+      console.error("Error duplicating employee:", err);
+      return res.status(500).send("Something went wrong!");
+    }
+  }
 }
 
 export default EmployeeManager;

@@ -9,7 +9,6 @@ const employeeSchema = new mongoose.Schema(
   {
     employeeId: {
       type: String,
-      required: true,
       unique: true,
     },
     insuranceType: {
