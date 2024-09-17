@@ -256,6 +256,123 @@ class EmployeeManager {
       return res.status(500).send("Something went wrong!");
     }
   }
+
+  async searchEmployee(req, res) {
+    try {
+      const { type, data } = req.body;
+
+      // Initialize the query object
+      let query = {};
+
+      // Check if type and data are arrays
+      if (
+        Array.isArray(type) &&
+        Array.isArray(data) &&
+        type.length === data.length
+      ) {
+        // Process as arrays
+        for (let i = 0; i < type.length; i++) {
+          const field = type[i];
+          const criteria = data[i];
+
+          if (!criteria) continue;
+
+          // Handle different types of conditions
+          if (criteria.is) {
+            query[field] = { $in: criteria.is };
+          }
+          if (criteria.isNot) {
+            query[field] = { $nin: criteria.isNot };
+          }
+          if (criteria.isEmpty) {
+            query[field] = { $exists: true, $eq: "" };
+          }
+          if (criteria.isNotEmpty) {
+            query[field] = { $exists: true, $ne: "" };
+          }
+          if (criteria.startWith) {
+            query[field] = {
+              $regex: `^${criteria.startWith.join("|")}`,
+              $options: "i",
+            };
+          }
+          if (criteria.endWith) {
+            query[field] = {
+              $regex: `${criteria.endWith.join("|")}$`,
+              $options: "i",
+            };
+          }
+          if (criteria.like) {
+            query[field] = { $regex: criteria.like.join("|"), $options: "i" };
+          }
+          if (criteria.contains) {
+            query[field] = {
+              $regex: criteria.contains.join("|"),
+              $options: "i",
+            };
+          }
+          if (criteria.notContains) {
+            query[field] = {
+              $not: { $regex: criteria.notContains.join("|"), $options: "i" },
+            };
+          }
+        }
+      } else {
+        // Process as single values
+        if (type && data) {
+          const field = type;
+          const criteria = data;
+
+          if (criteria.is) {
+            query[field] = { $in: criteria.is };
+          }
+          if (criteria.isNot) {
+            query[field] = { $nin: criteria.isNot };
+          }
+          if (criteria.isEmpty) {
+            query[field] = { $exists: true, $eq: "" };
+          }
+          if (criteria.isNotEmpty) {
+            query[field] = { $exists: true, $ne: "" };
+          }
+          if (criteria.startWith) {
+            query[field] = { $regex: `^${criteria.startWith}`, $options: "i" };
+          }
+          if (criteria.endWith) {
+            query[field] = { $regex: `${criteria.endWith}$`, $options: "i" };
+          }
+          if (criteria.like) {
+            query[field] = { $regex: criteria.like, $options: "i" };
+          }
+          if (criteria.contains) {
+            query[field] = { $regex: criteria.contains, $options: "i" };
+          }
+          if (criteria.notContains) {
+            query[field] = {
+              $not: { $regex: criteria.notContains, $options: "i" },
+            };
+          }
+        } else {
+          return res.status(400).send("Invalid search criteria");
+        }
+      }
+
+      // Fetch employees based on the constructed query
+      const employees = await Employee.find(query);
+
+      // If no employees are found, send a 404 response
+      if (employees.length === 0) {
+        return res.status(404).send("No employees found");
+      }
+
+      // Send the employees with a 200 OK status
+      return res.status(200).json(employees);
+    } catch (err) {
+      // Log the error and send a 500 response for server-side errors
+      console.error("Error searching for employees:", err);
+      return res.status(500).send("Something went wrong!");
+    }
+  }
 }
 
 export default EmployeeManager;

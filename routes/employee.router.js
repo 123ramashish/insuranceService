@@ -9,5 +9,7 @@ router.get("/sortorgroup", employeeManager.sortGroupEmployee);
 router.post("/", employeeManager.newEmployee);
 router.post("/update", employeeManager.updateEmployee);
 router.post("/delete:employeeId", employeeManager.deleteEmployee);
+router.post("/duplicate:employeeId", employeeManager.duplicateEmployee);
+// router.get("/search", employeeManager.searchEmployee);
 
 export default router;
