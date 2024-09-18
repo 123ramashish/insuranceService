@@ -89,7 +89,7 @@ function SignupForm() {
         success: "Email verified successfully!",
         error: "",
       }));
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       setFormState((prevState) => ({
         ...prevState,

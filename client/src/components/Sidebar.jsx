@@ -13,7 +13,7 @@ function Sidebar() {
 
         <nav className="flex flex-col space-y-4">
           <a
-            href="/home"
+            href="/dashboard"
             className={`flex items-center space-x-2 py-2 px-4 ${
               currentPath === "/home" ? "bg-indigo-700" : ""
             } rounded-md hover:bg-indigo-700`}

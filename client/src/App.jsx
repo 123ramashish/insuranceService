@@ -4,7 +4,6 @@ import LoginForm from "./components/LoginForm";
 import Dashboard from "./pages/Dashboard";
 import AllRequest from "./pages/AllRequest";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
 import Request from "./components/Request";
 
 function App() {
@@ -15,7 +14,6 @@ function App() {
         <Routes>
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/home" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/allrequest" element={<AllRequest />} />
           <Route path="/addrequest" element={<Request />} />
