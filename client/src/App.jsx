@@ -5,7 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import AllRequest from "./pages/AllRequest";
 import Navbar from "./components/Navbar";
 import Request from "./components/Request";
-import OnlyAdminPrivateRoute from "./components/OnlyAdminRoute";
+// import OnlyAdminPrivateRoute from "./components/OnlyAdminRoute";
 
 function App() {
   return (
@@ -16,10 +16,10 @@ function App() {
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route element={<OnlyAdminPrivateRoute />}>
-            <Route path="/allrequest" element={<AllRequest />} />
-            <Route path="/addrequest" element={<Request />} />
-          </Route>
+          {/* <Route element={<OnlyAdminPrivateRoute />}> */}
+          <Route path="/allrequest" element={<AllRequest />} />
+          <Route path="/addrequest" element={<Request />} />
+          {/* </Route> */}
         </Routes>
       </div>
     </Router>

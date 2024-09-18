@@ -37,8 +37,7 @@ function LoginForm() {
       }
 
       const data = await response.json();
-      console.log(data.user, data.user.admin);
-      dispatch(signInSuccess({ user: data.user }));
+      dispatch(signInSuccess(data));
       navigate("/dashboard"); // Navigate to dashboard after successful login
     } catch (err) {
       setError(err.message);

@@ -16,15 +16,10 @@ class EmployeeManager {
         reason,
       } = req.body;
 
-      console.log("New employee request received");
+      console.log("New employee request received", req.body);
 
       // Validate required fields
-      if (
-        !department?.trim() ||
-        !typeOfLeave?.trim() ||
-        !startDate ||
-        !endDate
-      ) {
+      if (!department || !typeOfLeave || !startDate || !endDate) {
         return res.status(400).send("All required fields must be filled");
       }
 
@@ -44,16 +39,16 @@ class EmployeeManager {
       // Create a new employee
       const newEmployee = new Employee({
         employeeId,
-        insuranceType: insuranceType || "Not found",
+        insuranceType,
         department,
         typeOfLeave,
         startDate,
         endDate,
-        carNumber: carNumber || "Not found",
-        insuranceCompany: insuranceCompany || "Not found",
-        premium: premium || 0,
-        grossPremium: grossPremium || 0,
-        reason: reason || "Not found",
+        carNumber,
+        insuranceCompany,
+        premium,
+        grossPremium,
+        reason,
       });
 
       // Save the employee to the MongoDB database

@@ -105,7 +105,6 @@ export const login = async (req, res) => {
         name: user.name,
         admin: user.admin,
       },
-      token,
     });
   } catch (err) {
     return res.status(500).json({ message: "Error logging in", error: err });

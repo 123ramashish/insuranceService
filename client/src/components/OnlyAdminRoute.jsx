@@ -1,12 +1,18 @@
 import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { Modal } from "flowbite-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function OnlyAdminPrivateRoute() {
-  const { user } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
   const [open, setOpen] = useState(true);
-  return user && user.admin ? (
+
+  // Debugging: Check if the user data is correctly populated
+  useEffect(() => {
+    console.log("User data in state:", currentUser);
+  }, [currentUser]);
+
+  return currentUser && currentUser.admin ? (
     <Outlet />
   ) : (
     <Modal

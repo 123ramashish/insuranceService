@@ -1,11 +1,10 @@
 // userSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 
 // Initial state
 const initialState = {
-  user: null,
+  currentUser: null,
 };
-
 // Create the user slice
 const userSlice = createSlice({
   name: "user",
@@ -13,7 +12,8 @@ const userSlice = createSlice({
   reducers: {
     // Action to set the user data after successful sign-in
     signInSuccess: (state, action) => {
-      state.user = action.payload.user;
+      state.currentUser = action.payload.user;
+      console.log(state.currentUser.admin);
     },
   },
 });
