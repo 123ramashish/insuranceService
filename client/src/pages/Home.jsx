@@ -1,20 +1,20 @@
-import React from "react";
 import Sidebar from "../components/Sidebar";
 import MainContent from "../components/MainContent";
 import EmployeeTable from "../components/EmployeeTable";
 
-function Dashboard() {
+function Home() {
   return (
-    <div className="flex bg-gray-100">
-      <div className="w-1/4">
+    <div className="flex sm:flex-col lg:flex-row bg-gray-100 w-full">
+      <div className="lg:w-1/4 sm:w-full">
         <Sidebar />
       </div>
-      <div className="flex flex-col w-3/4 ml-12">
+      <div className="flex flex-col sm:w-96 lg:w-3/4 lg:absolute top-16 left-96 ">
         <MainContent />
+
         <EmployeeTable />
       </div>
     </div>
   );
 }
 
-export default Dashboard;
+export default Home;
