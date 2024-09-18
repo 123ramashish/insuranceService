@@ -11,6 +11,6 @@ router.post("/", employeeManager.newEmployee);
 router.patch("/update", employeeManager.updateEmployee);
 router.delete("/delete/:id", employeeManager.deleteEmployee);
 router.post("/duplicate/:id", employeeManager.duplicateEmployee);
-router.get("/search", employeeManager.searchEmployee);
+router.post("/search", employeeManager.searchEmployee);
 
 export default router;

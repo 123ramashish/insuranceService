@@ -4,7 +4,7 @@ import EmployeeTable from "../components/EmployeeTable";
 
 function Dashboard() {
   return (
-    <div className="flex bg-gray-100">
+    <div className="flex bg-gray-100 mt-16">
       <div className="w-1/4">
         <Sidebar />
       </div>
