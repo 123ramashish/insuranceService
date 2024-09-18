@@ -4,7 +4,6 @@ import { createSlice } from "@reduxjs/toolkit";
 // Initial state
 const initialState = {
   user: null,
-  admin: false,
 };
 
 // Create the user slice
@@ -15,7 +14,6 @@ const userSlice = createSlice({
     // Action to set the user data after successful sign-in
     signInSuccess: (state, action) => {
       state.user = action.payload.user;
-      state.admin = action.payload.admin;
     },
   },
 });

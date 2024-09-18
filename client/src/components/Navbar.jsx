@@ -4,7 +4,6 @@ function Navbar() {
   const [active, setActive] = useState("Home");
 
   const navItems = ["SignUp", "Login", "Dashboard"];
-
   return (
     <nav className="flex justify-between items-center py-4 absolute top-0 w-full overflow-hidden z-40 bg-gray-300">
       <div className="flex space-x-6 ml-8">

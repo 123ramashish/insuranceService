@@ -90,15 +90,23 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid password." });
     }
 
-    // Generate JWT token for the admin
+    // Generate JWT token for the user (admin field is included)
     const token = jwt.sign(
       { id: user._id, email: user.email, admin: user.admin },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
-    // Return the token
-    return res.status(200).json({ message: "Login successful", token });
+    // Return the user and token
+    return res.status(200).json({
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        admin: user.admin,
+      },
+      token,
+    });
   } catch (err) {
     return res.status(500).json({ message: "Error logging in", error: err });
   }
