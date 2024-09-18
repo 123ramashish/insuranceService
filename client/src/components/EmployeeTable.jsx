@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoEyeOutline } from "react-icons/io5";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { Modal } from "flowbite-react";
@@ -6,36 +6,32 @@ import { Modal } from "flowbite-react";
 function EmployeeTable() {
   const [openModal, setOpenModal] = useState(false);
   const [opencolumn, setOpencolumn] = useState(false);
-  const leaveRequests = [
-    {
-      employeeId: "E012",
-      department: "Operations",
-      insuranceName: "Travel",
-      typeOfLeave: "Casual Leave",
-      startDate: "18-Sep-2024",
-      endDate: "23-Sep-2024",
-      carNumber: "DL4525",
-      insuranceCompany: "BAJAJ ALLIANZ GENERAL INS. CO. LTD",
-      grossPremium: "",
-      premium: "",
-    },
-    {
-      employeeId: "E011",
-      department: "Marketing",
-      insuranceName: "Health",
-      typeOfLeave: "Sick Leave",
-      startDate: "16-Sep-2024",
-      endDate: "21-Sep-2024",
-      carNumber: "",
-      insuranceCompany: "TATA-AIG GENERAL INSURANCE CO. LTD",
-      grossPremium: "",
-      premium: "",
-    },
-  ];
+  const [employees, setEmployees] = useState([]); // Initialize as an empty array
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/employee", {
+          method: "GET",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch employee data");
+        }
+
+        const data = await response.json();
+        setEmployees(data); // Assuming `data` is an array of employees
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="px-4 ">
-      <div className=" overflow-x-auto overflow-y-auto">
+      <div className="overflow-x-scroll overflow-y-scroll">
         <table className="bg-white border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
@@ -55,42 +51,57 @@ function EmployeeTable() {
             </tr>
           </thead>
           <tbody>
-            {leaveRequests.map((request, index) => (
-              <tr
-                key={index}
-                className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
-              >
-                <td className="py-2 px-4 border relative">
-                  <HiOutlineDotsHorizontal onClick={() => setOpenModal(true)} />
+            {employees.length > 0 ? (
+              employees.map((emp, index) => (
+                <tr
+                  key={emp._id}
+                  className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                >
+                  <td className="py-2 px-4 border relative">
+                    <HiOutlineDotsHorizontal
+                      onClick={() => setOpenModal(true)}
+                    />
+                  </td>
+                  <td className="py-2 px-4 border">{emp.employeeId}</td>
+                  <td className="py-2 px-4 border">{emp.department}</td>
+                  <td className="py-2 px-4 border">{emp.insuranceName}</td>
+                  <td className="py-2 px-4 border">{emp.typeOfLeave}</td>
+                  <td className="py-2 px-4 border">{emp.startDate}</td>
+                  <td className="py-2 px-4 border">{emp.endDate}</td>
+                  <td className="py-2 px-4 border">{emp.carNumber}</td>
+                  <td className="py-2 px-4 border">{emp.insuranceCompany}</td>
+                  <td className="py-2 px-4 border">{emp.grossPremium}</td>
+                  <td className="py-2 px-4 border">{emp.premium}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="11" className="py-4 px-6 text-center">
+                  No data available
                 </td>
-
-                <td className="py-2 px-4 border">{request.employeeId}</td>
-                <td className="py-2 px-4 border">{request.department}</td>
-                <td className="py-2 px-4 border">{request.insuranceName}</td>
-                <td className="py-2 px-4 border">{request.typeOfLeave}</td>
-                <td className="py-2 px-4 border">{request.startDate}</td>
-                <td className="py-2 px-4 border">{request.endDate}</td>
-                <td className="py-2 px-4 border">{request.carNumber}</td>
-                <td className="py-2 px-4 border">{request.insuranceCompany}</td>
-                <td className="py-2 px-4 border">{request.grossPremium}</td>
-                <td className="py-2 px-4 border">{request.premium}</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
+      {/* Action Modal */}
       <Modal show={openModal} onClose={() => setOpenModal(false)} className="">
         <Modal.Header></Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
             <p className="hover:bg-gray-300 p-2 cursor-pointer">Edit</p>
-            <p className="hover:bg-gray-300 p-2 cursor-pointer">Duplicate</p>
-            <p className="hover:bg-gray-300 p-2 cursor-pointer">Delete</p>
+            <p
+              className="hover:bg-gray-300 p-2 cursor-pointer"
+              // onClick={handleDelete}
+            >
+              Delete
+            </p>
           </div>
         </Modal.Body>
       </Modal>
 
+      {/* Column Show/Hide Modal */}
       <Modal show={opencolumn} onClose={() => setOpencolumn(false)}>
         <Modal.Header>Show/hide column</Modal.Header>
         <Modal.Body>

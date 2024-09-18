@@ -16,8 +16,6 @@ class EmployeeManager {
         reason,
       } = req.body;
 
-      console.log("New employee request received", req.body);
-
       // Validate required fields
       if (!department || !typeOfLeave || !startDate || !endDate) {
         return res.status(400).send("All required fields must be filled");
@@ -34,7 +32,6 @@ class EmployeeManager {
 
       // Format new employeeId with leading zeros
       const employeeId = `E${newIdNumber.toString().padStart(3, "0")}`;
-      console.log("Employee ID created:", employeeId);
 
       // Create a new employee
       const newEmployee = new Employee({
@@ -53,7 +50,6 @@ class EmployeeManager {
 
       // Save the employee to the MongoDB database
       await newEmployee.save();
-      console.log("Data saved to database");
 
       return res.status(201).send("Employee added successfully!");
     } catch (err) {
@@ -64,28 +60,31 @@ class EmployeeManager {
 
   async getAllEmployee(req, res) {
     try {
-      // Fetch all users from the database
-      const employee = await Employee.find();
-
-      // If no users found, send a 404 response
-      if (employee.length === 0) {
-        return res.status(404).send("No data available");
+      // Fetch all employees from the database
+      const employees = await Employee.find();
+      // If no employees found, send a 404 response
+      if (employees.length === 0) {
+        return res.status(404).json({ message: "No data available" });
       }
 
-      // If users are found, send them with a 200 OK status
-      return res.status(200).json(employee);
+      // If employees are found, send them with a 200 OK status
+      return res.status(200).send(employees);
     } catch (err) {
+      // Log the error for debugging purposes
+      console.error(err);
+
       // Send a 500 response for any server-side errors
-      return res.status(500).send("Something went wrong!");
+      return res.status(500).json({ message: "Something went wrong!" });
     }
   }
+
   async getOneEmployee(req, res) {
     try {
       // Extract employeeId from the request parameters
-      const { employeeId } = req.params; // Use req.query if the ID is sent as a query parameter
-
+      const { employeeId } = new Object(req.params);
+      console.log("getoneemployee", employeeId, typeof employeeId);
       // Fetch the employee from the database using the employeeId
-      const employee = await Employee.findOne({ employeeId });
+      const employee = await Employee.findOne({ _id: employeeId });
 
       // If no employee found, send a 404 response
       if (!employee) {
@@ -199,10 +198,10 @@ class EmployeeManager {
   async deleteEmployee(req, res) {
     try {
       // Extract employeeId from request parameters
-      const { employeeId } = req.params;
+      const { id } = new Object(req.params);
 
       // Find and delete the employee with the given employeeId
-      const deletedEmployee = await Employee.findOneAndDelete({ employeeId });
+      const deletedEmployee = await Employee.findOneAndDelete({ _id: id });
 
       // Check if the employee was found and deleted
       if (!deletedEmployee) {
@@ -220,35 +219,40 @@ class EmployeeManager {
 
   async duplicateEmployee(req, res) {
     try {
-      // Extract employeeId from request parameters
+      // Extract employee ID from request parameters
       const { id } = req.params;
 
-      // Find the existing employee by employeeId
-      const existingEmployee = await Employee.findOne({ employeeId: id });
+      // Check if the ID is a valid MongoDB ObjectId
+      if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json({ message: "Invalid employee ID" });
+      }
+
+      // Find the existing employee by ID
+      const existingEmployee = await Employee.findById(id);
 
       // If the employee is not found, send a 404 response
       if (!existingEmployee) {
-        return res.status(404).send("Employee not found");
+        return res.status(404).json({ message: "Employee not found" });
       }
 
-      // Remove the employeeId from the existing employee document
-      const { employeeId, ...employeeData } = existingEmployee.toObject();
+      // Convert the existing employee document to a plain object
+      const employeeData = existingEmployee.toObject();
+      delete employeeData._id;
 
       // Create a new Employee instance with the copied data
-      const newEmployee = new Employee({
-        ...employeeData,
-        // You can add any default values here if needed
-      });
+      const newEmployee = new Employee(employeeData);
 
-      // Save the new employee to the database
+      // Save the new (duplicated) employee to the database
       await newEmployee.save();
 
       // Send a success response
-      return res.status(201).send("Employee duplicated successfully!");
+      return res
+        .status(201)
+        .json({ message: "Employee duplicated successfully!", newEmployee });
     } catch (err) {
       // Log the error and send a 500 response for server-side errors
       console.error("Error duplicating employee:", err);
-      return res.status(500).send("Something went wrong!");
+      return res.status(500).json({ message: "Something went wrong!" });
     }
   }
 

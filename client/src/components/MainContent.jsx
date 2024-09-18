@@ -4,31 +4,39 @@ function MainContent() {
   const [totalLeave, setTotalLeave] = useState(0);
   const [casualLeave, setCasualLeave] = useState(0);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch("/api/employee", {
-  //         method: "GET",
-  //       });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/employee", {
+          method: "GET",
+        });
 
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch employee data");
-  //       }
+        if (!response.ok) {
+          throw new Error("Failed to fetch employee data");
+        }
 
-  //       const data = await response.json();
+        const data = await response.json();
+        // Assuming data contains an array of leaves, filter by type for casual leaves
+        var count = 0;
+        var casualleave = 0;
+        data.map((item) => {
+          if (item.typeOfLeave != null) {
+            count++;
+          }
+          if (item.typeOfLeave === "Casual Leave") {
+            casualleave++;
+          }
+        });
+        setTotalLeave(count);
+        setCasualLeave(casualleave);
+        console.log(totalLeave);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
 
-  //       // Assuming data contains an array of leaves, filter by type for casual leaves
-  //       setTotalLeave(data.leaves.length); // Update with the total number of leaves
-  //       setCasualLeave(
-  //         data.leaves.filter((leave) => leave.type === "casual").length
-  //       ); // Update with casual leave count
-  //     } catch (error) {
-  //       console.error(error.message);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+    fetchData();
+  }, []);
 
   return (
     <div className="p-6 flex flex-col sm:w-full ml-12 justify-start sm:justify-center sm:items-center lg:justify-start lg:items-start">
