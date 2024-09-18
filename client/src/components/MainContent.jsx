@@ -10,13 +10,6 @@ function MainContent() {
           <h2 className="text-2xl font-bold text-blue-600">1</h2>
           <p className="text-gray-600">Casual Leaves</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-md text-center">
-          <input
-            type="text"
-            placeholder="Search Employee ID"
-            className=" p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mx-2"
-          />
-        </div>
       </div>
     </div>
   );

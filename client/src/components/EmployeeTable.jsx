@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoEyeOutline } from "react-icons/io5";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { Button, Modal } from "flowbite-react";
+import { Modal } from "flowbite-react";
 
 function EmployeeTable() {
   const [openModal, setOpenModal] = useState(false);
