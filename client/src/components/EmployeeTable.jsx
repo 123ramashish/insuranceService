@@ -110,7 +110,7 @@ function EmployeeTable() {
       <div className="overflow-x-scroll overflow-y-scroll">
         <table className=" bg-white border border-gray-300 ">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-gray-100 hover:bg-gray-400">
               {path !== "/dashboard" && (
                 <th className="text-left py-2 px-4 border">
                   <IoEyeOutline

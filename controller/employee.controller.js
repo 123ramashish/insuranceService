@@ -32,7 +32,6 @@ class EmployeeManager {
 
       // Format new employeeId with leading zeros
       const employeeId = `E${newIdNumber.toString().padStart(3, "0")}`;
-
       // Create a new employee
       const newEmployee = new Employee({
         employeeId,
@@ -262,102 +261,33 @@ class EmployeeManager {
 
   async searchEmployee(req, res) {
     try {
-      const { type, data } = req.body;
+      const data = req.body;
 
       // Initialize the query object
       let query = {};
+      // Check if data is an object and not empty
+      if (data && typeof data === "object") {
+        // Iterate over the entries of the data object
+        for (const [field, value] of Object.entries(data)) {
+          // Skip null or undefined values
+          if (value === null || value === undefined) continue;
 
-      // Check if type and data are arrays
-      if (
-        Array.isArray(type) &&
-        Array.isArray(data) &&
-        type.length === data.length
-      ) {
-        // Process as arrays
-        for (let i = 0; i < type.length; i++) {
-          const field = type[i];
-          const criteria = data[i];
-
-          if (!criteria) continue;
-
-          // Handle different types of conditions
-          if (criteria.is) {
-            query[field] = { $in: criteria.is };
-          }
-          if (criteria.isNot) {
-            query[field] = { $nin: criteria.isNot };
-          }
-          if (criteria.isEmpty) {
-            query[field] = { $exists: true, $eq: "" };
-          }
-          if (criteria.isNotEmpty) {
-            query[field] = { $exists: true, $ne: "" };
-          }
-          if (criteria.startWith) {
-            query[field] = {
-              $regex: `^${criteria.startWith.join("|")}`,
-              $options: "i",
-            };
-          }
-          if (criteria.endWith) {
-            query[field] = {
-              $regex: `${criteria.endWith.join("|")}$`,
-              $options: "i",
-            };
-          }
-          if (criteria.like) {
-            query[field] = { $regex: criteria.like.join("|"), $options: "i" };
-          }
-          if (criteria.contains) {
-            query[field] = {
-              $regex: criteria.contains.join("|"),
-              $options: "i",
-            };
-          }
-          if (criteria.notContains) {
-            query[field] = {
-              $not: { $regex: criteria.notContains.join("|"), $options: "i" },
-            };
+          if (value === "") {
+            // Check for empty strings in the database
+            query[field] = { $eq: "" };
+          } else if (typeof value === "string") {
+            // Handle string values with regex for partial matches and case insensitivity
+            query[field] = { $regex: `^${value}$`, $options: "i" };
+          } else {
+            // For other types, handle as exact matches
+            query[field] = value;
           }
         }
+
+        // Debugging: Log the constructed query
+        console.log("Constructed query:", query);
       } else {
-        // Process as single values
-        if (type && data) {
-          const field = type;
-          const criteria = data;
-
-          if (criteria.is) {
-            query[field] = { $in: criteria.is };
-          }
-          if (criteria.isNot) {
-            query[field] = { $nin: criteria.isNot };
-          }
-          if (criteria.isEmpty) {
-            query[field] = { $exists: true, $eq: "" };
-          }
-          if (criteria.isNotEmpty) {
-            query[field] = { $exists: true, $ne: "" };
-          }
-          if (criteria.startWith) {
-            query[field] = { $regex: `^${criteria.startWith}`, $options: "i" };
-          }
-          if (criteria.endWith) {
-            query[field] = { $regex: `${criteria.endWith}$`, $options: "i" };
-          }
-          if (criteria.like) {
-            query[field] = { $regex: criteria.like, $options: "i" };
-          }
-          if (criteria.contains) {
-            query[field] = { $regex: criteria.contains, $options: "i" };
-          }
-          if (criteria.notContains) {
-            query[field] = {
-              $not: { $regex: criteria.notContains, $options: "i" },
-            };
-          }
-        } else {
-          return res.status(400).send("Invalid search criteria");
-        }
+        return res.status(400).send("Invalid search criteria");
       }
 
       // Fetch employees based on the constructed query

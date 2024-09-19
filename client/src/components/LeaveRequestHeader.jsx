@@ -2,15 +2,16 @@ import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { HiPlus } from "react-icons/hi";
 import { Drawer } from "flowbite-react";
+import { useDispatch } from "react-redux";
+import { getEmployeeSuccess } from "../redux/employee/employeeSlice.js";
 
 function LeaveRequestHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     insuranceType: "",
     department: "",
-    leaveType: "",
-    otherDepartment: "",
-    otherLeaveType: "",
+    typeOfLeave: "",
     startDate: "",
     endDate: "",
     carNumber: "",
@@ -29,12 +30,68 @@ function LeaveRequestHeader() {
     }));
   };
 
-  // Handler for the search functionality
-  const handleSearch = () => {
-    // Implement search logic here (e.g., call an API or filter data)
-    console.log("Search initiated with data:", formData);
-    // Close the drawer after search
-    setIsOpen(false);
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/employee/search",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            insuranceType: formData.insuranceType,
+            department: formData.department,
+            typeOfLeave: formData.typeOfLeave,
+            startDate: formData.startDate,
+            endDate: formData.endDate,
+            carNumber: formData.carNumber,
+            insuranceCompany: formData.insuranceCompany,
+            premium: formData.premium,
+            grossPremium: formData.grossPremium,
+            reason: formData.reason,
+          }),
+        }
+      );
+
+      // Check if the response is OK
+      if (!response.ok) {
+        // Try to parse the error response as JSON
+        let errorMessage = "An error occurred";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || "Data not found!";
+        } catch (e) {
+          // If parsing JSON fails, handle plain text response
+          errorMessage = await response.text();
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Parse the response as JSON if it's OK
+      const data = await response.json();
+      console.log(data);
+      dispatch(getEmployeeSuccess(data));
+
+      // Reset the form data
+      setFormData({
+        insuranceType: "",
+        department: "",
+        typeOfLeave: "",
+        startDate: "",
+        endDate: "",
+        carNumber: "",
+        insuranceCompany: "",
+        premium: "",
+        grossPremium: "",
+        reason: "",
+      });
+
+      // Close the drawer after search
+      setIsOpen(false);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -101,27 +158,17 @@ function LeaveRequestHeader() {
                 <option value="Packing">Packing</option>
                 <option value="Other">Other</option>
               </select>
-              {formData.department === "Other" && (
-                <input
-                  type="text"
-                  name="otherDepartment"
-                  placeholder="Enter Other Department"
-                  value={formData.otherDepartment}
-                  onChange={handleChange}
-                  className="block w-full p-2 mt-2 border rounded"
-                />
-              )}
             </div>
 
             {/* Type of Leave */}
             <div className="mb-4">
-              <label htmlFor="leaveType" className="block">
+              <label htmlFor="typeOfLeave" className="block">
                 Type of Leave
               </label>
               <select
-                id="leaveType"
-                name="leaveType"
-                value={formData.leaveType}
+                id="typeOfLeave"
+                name="typeOfLeave"
+                value={formData.typeOfLeave}
                 onChange={handleChange}
                 className="block w-full p-2 border rounded"
               >
@@ -131,16 +178,6 @@ function LeaveRequestHeader() {
                 <option value="Public Holiday">Public Holiday</option>
                 <option value="Other">Other</option>
               </select>
-              {formData.leaveType === "Other" && (
-                <input
-                  type="text"
-                  name="otherLeaveType"
-                  placeholder="Enter Other Leave Type"
-                  value={formData.otherLeaveType}
-                  onChange={handleChange}
-                  className="block w-full p-2 mt-2 border rounded"
-                />
-              )}
             </div>
 
             {/* Start Date */}
@@ -257,10 +294,16 @@ function LeaveRequestHeader() {
 
             <div className="flex gap-4">
               <button
-                className="p-2 rounded-md shadow-md bg-blue-500 hover:bg-blue-600 text-white"
+                className="p-2 bg-blue-500 text-white rounded"
                 onClick={handleSearch}
               >
                 Search
+              </button>
+              <button
+                className="p-2 bg-gray-500 text-white rounded"
+                onClick={() => setIsOpen(false)}
+              >
+                Close
               </button>
             </div>
           </div>
