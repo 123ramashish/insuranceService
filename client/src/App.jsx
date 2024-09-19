@@ -6,7 +6,7 @@ import AllRequest from "./pages/AllRequest";
 import Navbar from "./components/Navbar";
 import Request from "./components/Request";
 import UpdateEmployee from "./components/UpdateEmployee";
-// import OnlyAdminPrivateRoute from "./components/OnlyAdminRoute";
+import OnlyAdminPrivateRoute from "./components/OnlyAdminRoute";
 
 function App() {
   return (

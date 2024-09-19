@@ -3,6 +3,8 @@ import { IoEyeOutline } from "react-icons/io5";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { Modal } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+
 import {
   getEmployeeId,
   getEmployeeSuccess,
@@ -11,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 function EmployeeTable() {
   const [openModal, setOpenModal] = useState(false);
   const [opencolumn, setOpencolumn] = useState(false);
+  const location = useLocation();
+  const path = location.pathname;
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -107,9 +111,15 @@ function EmployeeTable() {
         <table className=" bg-white border border-gray-300 ">
           <thead>
             <tr className="bg-gray-100">
-              <th className="text-left py-2 px-4 border">
-                <IoEyeOutline onClick={() => setOpencolumn(true)} />
-              </th>
+              {path !== "/dashboard" && (
+                <th className="text-left py-2 px-4 border">
+                  <IoEyeOutline
+                    onClick={() => setOpencolumn(true)}
+                    className="cursor-pointer"
+                    title="Open Column"
+                  />
+                </th>
+              )}
               {hideshow.empId && (
                 <th className="text-left py-2 px-4 border">Employee ID</th>
               )}
@@ -152,11 +162,13 @@ function EmployeeTable() {
                   className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                   onClick={() => dispatch(getEmployeeId(emp._id))}
                 >
-                  <td className="py-2 px-4 border relative">
-                    <HiOutlineDotsHorizontal
-                      onClick={() => setOpenModal(true)}
-                    />
-                  </td>
+                  {path !== "/dashboard" && (
+                    <td className="py-2 px-4 border relative">
+                      <HiOutlineDotsHorizontal
+                        onClick={() => setOpenModal(true)}
+                      />
+                    </td>
+                  )}
                   {hideshow.empId && (
                     <td className="py-2 px-4 border">{emp.employeeId}</td>
                   )}
