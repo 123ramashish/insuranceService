@@ -2,12 +2,19 @@ import { useEffect, useState } from "react";
 import { IoEyeOutline } from "react-icons/io5";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { Modal } from "flowbite-react";
-
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getEmployeeId,
+  getEmployeeSuccess,
+} from "../redux/employee/employeeSlice.js";
+import { useNavigate } from "react-router-dom";
 function EmployeeTable() {
   const [openModal, setOpenModal] = useState(false);
   const [opencolumn, setOpencolumn] = useState(false);
-  const [employees, setEmployees] = useState([]); // Initialize as an empty array
+  const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+  const { currentEmployee, id } = useSelector((state) => state.employee);
   // State to manage show/hide for each column
   const [hideshow, setHideshow] = useState({
     empId: true,
@@ -22,24 +29,23 @@ function EmployeeTable() {
     pre: true,
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/api/employee", {
-          method: "GET",
-        });
+  const fetchData = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/employee", {
+        method: "GET",
+      });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch employee data");
-        }
-
-        const data = await response.json();
-        setEmployees(data); // Assuming `data` is an array of employees
-      } catch (error) {
-        console.error(error.message);
+      if (!response.ok) {
+        throw new Error("Failed to fetch employee data");
       }
-    };
 
+      const data = await response.json();
+      dispatch(getEmployeeSuccess(data)); // Assuming `data` is an array of employees
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -49,6 +55,50 @@ function EmployeeTable() {
       ...prevState,
       [column]: !prevState[column], // Toggle column visibility
     }));
+  };
+
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    console.log(id);
+    // <UpdateEmployee props={id} />;
+    navigate("/updateemployee", { state: { id } });
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+
+    // Confirm deletion action
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this employee?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/employee/delete/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        alert("Deleted successfully!");
+        setOpenModal(false);
+        fetchData();
+        // Optionally, trigger a re-fetch or update the state to reflect the deletion
+      } else {
+        const errorData = await response.json();
+        alert(
+          `Failed to delete! Error: ${errorData.message || response.statusText}`
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      alert("An error occurred while trying to delete the employee.");
+    }
   };
 
   return (
@@ -95,11 +145,12 @@ function EmployeeTable() {
             </tr>
           </thead>
           <tbody>
-            {employees.length > 0 ? (
-              employees.map((emp, index) => (
+            {currentEmployee ? (
+              currentEmployee.map((emp, index) => (
                 <tr
                   key={emp._id}
                   className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                  onClick={() => dispatch(getEmployeeId(emp._id))}
                 >
                   <td className="py-2 px-4 border relative">
                     <HiOutlineDotsHorizontal
@@ -154,8 +205,18 @@ function EmployeeTable() {
         <Modal.Header></Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
-            <p className="hover:bg-gray-300 p-2 cursor-pointer">Edit</p>
-            <p className="hover:bg-gray-300 p-2 cursor-pointer">Delete</p>
+            <p
+              className="hover:bg-gray-300 p-2 cursor-pointer"
+              onClick={handleUpdate}
+            >
+              Edit
+            </p>
+            <p
+              className="hover:bg-gray-300 p-2 cursor-pointer"
+              onClick={handleDelete}
+            >
+              Delete
+            </p>
           </div>
         </Modal.Body>
       </Modal>

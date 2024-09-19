@@ -81,14 +81,18 @@ class EmployeeManager {
   async getOneEmployee(req, res) {
     try {
       // Extract employeeId from the request parameters
-      const { employeeId } = new Object(req.params);
-      console.log("getoneemployee", employeeId, typeof employeeId);
+      const { id } = req.params;
+
+      // Convert the string id to an ObjectId
+      const _id = new Object(id);
+      console.log("getoneemployee", _id, typeof _id);
+
       // Fetch the employee from the database using the employeeId
-      const employee = await Employee.findOne({ _id: employeeId });
+      const employee = await Employee.findOne({ _id });
 
       // If no employee found, send a 404 response
       if (!employee) {
-        return res.status(404).send("No data available");
+        return res.status(404).send("Employee not found.");
       }
 
       // If employee is found, send the employee data with a 200 OK status
@@ -96,7 +100,7 @@ class EmployeeManager {
     } catch (err) {
       // Send a 500 response for any server-side errors
       console.error("Error fetching employee:", err);
-      return res.status(500).send("Something went wrong!");
+      return res.status(500).send("Internal Server Error.");
     }
   }
 
@@ -156,8 +160,8 @@ class EmployeeManager {
       // Validate required fields
       if (
         !employeeId ||
-        !department?.trim() ||
-        !typeOfLeave?.trim() ||
+        !department ||
+        !typeOfLeave ||
         !startDate ||
         !endDate
       ) {
@@ -168,18 +172,18 @@ class EmployeeManager {
       const updatedEmployee = await Employee.findOneAndUpdate(
         { employeeId }, // Find employee by employeeId
         {
-          insuranceType: insuranceType || "Not found",
+          insuranceType,
           department,
           typeOfLeave,
           startDate,
           endDate,
-          carNumber: carNumber || "Not found",
-          insuranceCompany: insuranceCompany || "Not found",
-          premium: premium || 0,
-          grossPremium: grossPremium || 0,
-          reason: reason || "Not found",
+          carNumber,
+          insuranceCompany,
+          premium,
+          grossPremium,
+          reason,
         },
-        { new: true } // Return the updated document
+        { new: true }
       );
 
       // Check if the employee was found and updated

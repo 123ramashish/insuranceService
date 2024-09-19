@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import AllRequest from "./pages/AllRequest";
 import Navbar from "./components/Navbar";
 import Request from "./components/Request";
+import UpdateEmployee from "./components/UpdateEmployee";
 // import OnlyAdminPrivateRoute from "./components/OnlyAdminRoute";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           {/* <Route element={<OnlyAdminPrivateRoute />}> */}
           <Route path="/allrequest" element={<AllRequest />} />
           <Route path="/addrequest" element={<Request />} />
+          <Route path="/updateemployee" element={<UpdateEmployee />} />
           {/* </Route> */}
         </Routes>
       </div>
